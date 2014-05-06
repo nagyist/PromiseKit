@@ -203,8 +203,7 @@ All the explicit error handling clutters the code.
 [NSURLConnection GET:@"http://example.com/user.json"].then(^(id json){
     id home = [json valueForKeyPath:@"user.home.address"];
     return [CLGeocoder geocode:home];
-}).then(^(NSArray *placemarks){
-    id placemark = [[MKPlacemark alloc] initWithPlacemark:placemarks[0]];
+}).then(^(CLPlacemark *placemark){
     MKDirectionsRequest *rq = [MKDirectionsRequest new];
     rq.source = [MKMapItem mapItemForCurrentLocation];
     rq.destination = [[MKMapItem alloc] initWithPlacemark:placemark];
@@ -414,19 +413,21 @@ A Promise to get the user’s location:
 {% highlight objectivec %}
 #import "PromiseKit+CoreLocation.h"
 
-[CLGeocoder geocode:@"mount rushmore"].then(^(NSArray *placemarks){
+[CLGeocoder geocode:@"mount rushmore"].then(^(CLPlacemark *firstPlacemark){
     //…
 }).catch(^(NSError *error){
     //…
 });
 
 CLLocation *someLocation = …;
-[CLGeocoder reverseGeocode:someLocation].then(^(NSArray *placemarks){
+[CLGeocoder reverseGeocode:someLocation].then(^(CLPlacemark *firstPlacemark){
     //…
 }).catch(^(NSError *error){
     //…
 });
 {% endhighlight %}
+
+`CLGeocoders` asynchronously return one or *more* placemarks. The Promise thens the first placemark, and as the optional second parameter, all the placemarks (which often is just an array of one item). So if you want to check all placemarks, ensure you `then` two parameters.
 
 
 ##UIAlertView+PromiseKit
@@ -448,6 +449,8 @@ alert.promise.then(^(NSNumber *dismissedIndex){
 {% endhighlight %}
 
 This promise will not trigger a `catch` handler. At one point we had the cancel button trigger `catch`, but this led to unreliable error handling. **Only errors trigger `catch` handlers**.
+
+The promise optionally thens the `UIAlertView` instance as the second parameter, should you need it.
 
 
 ##UIActionSheet+PromiseKit
@@ -614,7 +617,17 @@ For the community’s benefit, someone should create a `Parse+PromiseKit` pod.
 - (Promise *)promise {
     return [Promise new:^(PromiseResolver *fulfiller, PromiseResolver *rejecter){
         [self setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *op, id responseObject){
-            fulfiller(responseObject);
+
+            // PMKManifold allows you to fulfill promises with
+            // multiple parameters.
+            fulfiller(PMKManifold(responseObject, op));
+
+            // We inverted the parameter order relative to the
+            // AFNetworking completionBlock because promises order
+            // their parameters from most to least important. Thus
+            // consumers can `then` without the second parameter
+            // if they don’t need it.
+
         }) failure:^(AFHTTPRequestOperation *op , NSError *error){
             rejecter(error);
         }];
