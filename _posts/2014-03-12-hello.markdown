@@ -615,7 +615,7 @@ For the community’s benefit, someone should create a `Parse+PromiseKit` pod.
 @interface AFHTTPRequestOperation (PromiseKit)
 
 - (Promise *)promise {
-    return [Promise new:^(PromiseResolver *fulfiller, PromiseResolver *rejecter){
+    return [Promise new:^(PromiseResolver fulfiller, PromiseResolver rejecter){
         [self setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *op, id responseObject){
 
             // PMKManifold allows you to fulfill promises with
