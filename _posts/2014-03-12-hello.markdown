@@ -761,3 +761,8 @@ The fine print of PromiseKit is mostly exactly what you would expect, so don’t
 * Not returning from a `catch` handler (or returning nil) causes PromiseKit to consider the Promise complete. No further bubbling occurs.
 * Nothing happens if you add a `then` to a failed Promise (unless you subsequently add a `catch` handler to the Promise returned from that `then`)
 * Adding a `catch` handler to a failed Promise will execute that fail handler: this is converse to adding the same to a **pending** Promise that has a higher `catch` than the one you just added.
+
+
+#Cancelation & Progress
+
+A good asynchronous framework provides cancelation and progress information. Our thinking with PromiseKit is that `NSProgress` is the right tool. Feel free to submit issues that discuss how this might work.
