@@ -543,6 +543,10 @@ snapshotter.region = …;
 
 Check out [Promise.h](https://github.com/mxcl/PromiseKit/blob/master/PromiseKit/Promise.h) and the rest of the sources.
 
+###Guides
+
+* [Promises Pay](http://pop-pays.squarespace.com/tech/2014/4/28/popular-promises)
+
 
 #Promisizing Your Codebase
 
